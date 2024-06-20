@@ -4,6 +4,7 @@ import glob
 import pandas as pd
 
 class Tablers:
+    #Creates a class for each person which contains the dictionary of each of their schedules
 
     def __init__(self, schedule):
         self.__schedule = schedule
@@ -12,19 +13,26 @@ class Tablers:
         return self.__schedule
 
 def retrieve_file_helper():
+    #Retrieves a list of all of the CSV files in the folder schedules
         # Specify the folder containing the CSV files
     folder_path = 'schedules'  # Replace with your folder path
 
     # Get all CSV files in the folder and puts them in a list
     csv_files = glob.glob(os.path.join(folder_path, "*.csv"))
 
+    #Returns it as a list
     return csv_files
 
 
 def extract_schedule_helper(filename):
-    #Open's the file
+    #Open's the file, only one file at a time so it will run x times for the x amount of files
+
+    #Returns a list with each day of the week
     daysofweek = daysofweekstorage()
+    #Returns a list of all the military times within the given range
     timestorage = timeframestoragemilitary()
+
+    #Used for downstream applications
     count = 0
     
     #Creates a dictionary with keys as days of the week, each with an empty dictionary
@@ -33,19 +41,20 @@ def extract_schedule_helper(filename):
 
 
     with open(filename, "r") as insidefile:
+        #Reads each of the lines
         for line in insidefile:
 
-
             newtext = line
-            #Skips lines that do not have the 
-
+            
+            #Isolates the line with the name with it 
             if "Name:" in newtext:
                 splicingindex = newtext.find("Name:")
                 newtext = newtext[splicingindex + 6:]
                 splicingindex = newtext.find(",")
+                #Extracts the tabler's name
                 personsname = newtext[:splicingindex]
                 
-
+            #Skips all lines that don't start with a time
             elif newtext[0].isnumeric() == False:
                 continue
 
@@ -53,28 +62,33 @@ def extract_schedule_helper(filename):
                 splicingindex = newtext.find(",")
                 newtext = newtext[splicingindex + 1:]
                 for day in daysofweek:
+                    #Add's the times in for each day of the week
                     splicingindex = newtext.find(",")
                     weekschedule[day][timestorage[count]] = newtext[:splicingindex]
                     newtext = newtext[splicingindex + 1:]
 
                 count += 1
-
+        #Return's the person;s schedule under standard time and their name
         return weekschedule,personsname
-
-extract_schedule_helper("schedules/Ariel_sheet.csv")
     
 def createscheduledatabase():
-    listoftablers = {}
+    dictoftablers = {}
+    
+    #Uses the function to get the list of all availiable csv files
     listoffiles = retrieve_file_helper()
     for file in listoffiles:
+        #Extracts the information from each of the file
         schedule, personsname = extract_schedule_helper(file)
         personsname = personsname.lower()
+        #Creates a class for each of the schedule
         tabler = Tablers(schedule)
-        listoftablers[personsname] = tabler
+        #Stores this in a dictionary
+        dictoftablers[personsname] = tabler
 
-    return listoftablers
+    return dictoftablers
 
-def createdaydatabase(scheduledict):
+def createdaydatabase(scheduledict): #Schedule dict is the dictionary of everyone's schedule
+    #This command will create the data base in which we will se who is availiable for each day of the week
     counter = 0
 
     #Gives me a list of the days of the week that we are looking at
@@ -93,6 +107,8 @@ def createdaydatabase(scheduledict):
         person_schedule = schedule.getheschedule()
         for day in daysofweek:
             for time, available in person_schedule[day].items():
+
+                #Adds there name to the database
                 if available == "1":
                     daydatabase[day][time].append(name)
         
