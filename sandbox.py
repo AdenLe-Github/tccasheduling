@@ -1,3 +1,5 @@
-dictionary = {"A":1, "B":2}
+mystring = ""
+mylist = []
 
-print(list(dictionary.keys()))
+if mylist == []:
+    print("True")

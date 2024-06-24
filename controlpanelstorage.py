@@ -6,10 +6,10 @@ def daysofweekkeyconversionstorage():
     mydict = {"m": "Monday", "t": "Tuesday", "w": "Wednesday", "th": "Thursday", "f": "Friday"}
     return mydict
 
-def timeframecreatorstorageregular():
+def timeframecreatorstorageregular(start = 900, end = 1900):
     # Input in military time
-    starttime = 900
-    endtime = 1900
+    starttime = int(start)
+    endtime = int(end)
 
     timeframestoragetemp = []
     timeframesstorageexport = []
@@ -48,8 +48,8 @@ def timeframecreatorstorageregular():
 
 
 
-def timecreatorincrements():
-    timestoragetemp = timeframecreatorstorageregular()
+def timecreatorincrements(regularstorage = timeframecreatorstorageregular()):
+    timestoragetemp = regularstorage
     timestorageexport = []
     for i in range(len(timestoragetemp) - 1):
         timestorageexport.append(f"{timestoragetemp[i]} - {timestoragetemp[i + 1]}")
